@@ -11,6 +11,7 @@ import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import JobSeeker from "./src/model/JobSeeker.js";
 import Job from "./src/model/Job.js";
+import Applicant from "./src/model/Applicants.js";
 
 dotenv.config();
 const server= express();
@@ -76,7 +77,7 @@ server.get("/home_jobSeeker" ,auth,  (req, res) => {
 server.post("/filterByParameters" , auth , login_register_jobSeeker.filterJobs);
 server.post("/filterJobs_recruiter" ,auth, login_register_recruiter.filterJobsByCompanyOrType);
 server.get("/apply_for_job/:id" , auth , login_register_jobSeeker.sendProfile);
-server.get("/applicants/:id" , auth , login_register_jobSeeker.viewApplicants);
+server.get("/applicants/:id" , auth , login_register_recruiter.viewApplicants);
 
 server.get("/profile-picture/:id", async (req, res) => {
     try {
@@ -111,6 +112,29 @@ server.get("/job-logo/:id", async (req, res) => {
         console.error(err);
         res.status(500).send("Error loading logo");
     }
+});
+
+
+server.get("/applicant-profile/:id", async (req, res) => {
+
+    try {
+
+        const applicant = await Applicant.findById(req.params.id);
+
+        if (!applicant || !applicant.profilePicture || !applicant.profilePicture.data) {
+            return res.status(404).send("Profile picture not found");
+        }
+
+        res.set("Content-Type", applicant.profilePicture.contentType);
+        res.send(applicant.profilePicture.data);
+
+    } catch (err) {
+
+        console.error(err);
+        res.status(500).send("Error loading profile picture");
+
+    }
+
 });
 
 server.listen(process.env.PORT || 4600 ,  () => {

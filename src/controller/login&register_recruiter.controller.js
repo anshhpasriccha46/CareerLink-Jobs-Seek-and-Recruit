@@ -1,6 +1,7 @@
 import { sendEmail } from "../../mail.js";
 import Job from "../model/Job.js";
 import Recruiter from "../model/Recruiter.js";
+import Applicant from "../model/Applicants.js";
 
 export default class login_register_recruiter{
     static getintro(req, res){
@@ -158,6 +159,23 @@ export default class login_register_recruiter{
     return res.render("homepage_recruiter", {
         layout: "layout_recruiter",
         jobs: filteredResults
+    });
+
+}
+    
+
+static async viewApplicants(req, res) {
+
+    const applicants = await Applicant.find({
+        jobId: req.params.id
+    });
+
+    res.locals.styles =
+        '<link rel="stylesheet" href="/recruiter_applicants.css">';
+
+    return res.render("recruiter_applicants", {
+        layout: "layout_recruiter",
+        applicants
     });
 
 }

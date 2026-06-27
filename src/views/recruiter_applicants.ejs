@@ -1,11 +1,42 @@
 <main>
   <h2>Applicants:</h2>
-<% if(applicants){applicants.forEach(function(applicant) { %>
-  <div class="applicants">
-    <img  src="/uploads/<%= applicant.image %>" alt="Profile Picture" class="profile_pic" />
-    <span class="applicant_name"><%= applicant.name %></span>
-    <span class="applicant_experience"><%= applicant.experience %> yrs</span>
-    <span class="applicant_email"><%= applicant.email %></span>
-  </div>
-<% })} %>
+
+  <% if (applicants.length > 0) { %>
+
+    <% applicants.forEach(function(applicant) { %>
+
+      <div class="applicants">
+
+        <% if (applicant.profilePicture && applicant.profilePicture.data) { %>
+          <img
+            src="/applicant-profile/<%= applicant._id %>"
+            alt="Profile Picture"
+            class="profile_pic"
+          />
+        <% } else { %>
+          <img
+            src="/images/default-profile.png"
+            alt="Default Profile"
+            class="profile_pic"
+          />
+        <% } %>
+
+        <span class="applicant_name"><%= applicant.name %></span>
+
+        <span class="applicant_experience">
+          <%= applicant.experience %> yrs
+        </span>
+
+        <span class="applicant_email"><%= applicant.email %></span>
+
+      </div>
+
+    <% }) %>
+
+  <% } else { %>
+
+    <p>No applicants yet.</p>
+
+  <% } %>
+
 </main>

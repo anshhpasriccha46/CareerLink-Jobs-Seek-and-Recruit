@@ -5,7 +5,7 @@ import { sendEmail } from "../../mail.js";
 import recruiter_jobData from "../model/recruiter_jobPostData.model.js";
 import user_profile from "../model/jobSeeker_profile.js";
 import sendUserProfile from "../../mail_profile.js";
-import applicant from "../model/recruiter_applicants.js";
+import Applicant from "../model/Applicants.js";
 
 export default class login_register_jobSeeker{
 
@@ -140,39 +140,53 @@ export default class login_register_jobSeeker{
         jobs: filteredResults
     });
 }
-static sendProfile(req , res){
-    const id=req.params.id;
-    console.log("*************GOT id" , id);
-    const profile=user_profile.getProfilesByEmail(req.session.email);
-    const recruiter_email=recruiter_jobData.getJobById(id).email;
-    
-    sendUserProfile(profile , recruiter_email);
+static async sendProfile(req, res) {
+
+    const jobId = req.params.id;
+
+    // Logged-in job seeker
+    const profile = await JobSeeker.findById(req.session.userId);
+
+    // Job being applied to
+    const job = await Job.findById(jobId);
+
+    // Send profile to recruiter
+    sendUserProfile(profile, job.email);
+
     console.log("Email and profile sent");
-    
-    applicant.addApplicant(profile.profilePic , req.session.name , req.session.email , profile.experience ,id);
-console.log(profile.profilePic);
-    const job = recruiter_jobData.getData();
-    
-     res.locals.styles = '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
-        return res.render("homepage_jobSeeker" , {
-        layout: 'layout_jobSeeker',
+
+    // Save applicant
+   await Applicant.create({
+
+    jobId: job._id,
+
+    jobSeekerId: profile._id,
+
+    name: profile.name,
+
+    email: profile.email,
+
+    experience: profile.experience,
+
+    profilePicture: profile.profilePicture
+
+});
+
+    // Reload all jobs
+    const jobs = await Job.find();
+
+    res.locals.styles =
+        '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
+
+    return res.render("homepage_jobSeeker", {
+        layout: "layout_jobSeeker",
         profile,
-        jobs: job,
+        jobs,
         successMessage: "Applied Successfully"
     });
-}
-static viewApplicants(req, res){
-    const id=req.params.id;
-    const allapps=applicant.getData();
-
-   const apps=allapps.filter(function(aaps){
-        return aaps.id === id;
-    })
-
-    res.locals.styles = '<link rel="stylesheet" href="/recruiter_applicants.css">';
-    return res.render("recruiter_applicants" , {layout:'layout_recruiter' , applicants:apps});
 
 }
+
 
 
 

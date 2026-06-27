@@ -4,7 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Post a New Job</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+
   <style>
     h2 {
       text-align: center;
@@ -20,7 +25,7 @@
       padding: 30px;
       background-color: #f9f9f9;
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
 
     label {
@@ -43,63 +48,128 @@
     }
   </style>
 </head>
+
 <body>
 
-  <main>
-    <h2>Post a New Job</h2>
+<main>
 
-    <form action="/post-job" method="POST" enctype="application/x-www-form-urlencoded">
-      <!-- Company Logo -->
-      <div class="mb-3">
-        <label for="logo" class="form-label">Company Logo:</label>
-        <input type="text" class="form-control" name="logo" id="logo" required />
-      </div>
+  <h2>Post a New Job</h2>
 
-      <!-- Work Experience -->
-      <div class="mb-3">
-        <label for="experience" class="form-label">Work Experience Required (in years):</label>
-        <input type="number" class="form-control" name="experience" id="experience" min="0" max="50" required />
-      </div>
+  <form
+    action="/post-job"
+    method="POST"
+    enctype="multipart/form-data"
+  >
 
-      <!-- Job Type -->
-      <div class="mb-3">
-        <label for="jobType" class="form-label">Job Type:</label>
-        <select class="form-select" name="jobType" id="jobType" required>
-          <option value="">-- Select a type --</option>
-          <option value="Finance">Finance</option>
-          <option value="IT">IT</option>
-          <option value="Sales">Sales</option>
-          <option value="Marketing">Marketing</option>
-          <option value="HR">Human Resources</option>
-        </select>
-      </div>
+    <!-- Company Logo -->
+    <div class="mb-3">
+      <label for="logo" class="form-label">Company Logo</label>
+      <input
+        type="file"
+        class="form-control"
+        id="logo"
+        name="logo"
+        accept="image/*"
+        required
+      >
+    </div>
 
-         <div class="mb-3">
-        <label for="location" class="form-label">Location</label>
-        <input placeholder="location" type="text" class="form-control" name="location" id="location" min="0" max="50" required />
-      </div>
-      
-      <div class="mb-3">
-        <label for="company" class="form-label">Company</label>
-        <input type="text" class="form-control" id="company" name="company" placeholder="Enter your company">
-      </div>
+    <!-- Experience -->
+    <div class="mb-3">
+      <label for="experience" class="form-label">
+        Work Experience Required (in years)
+      </label>
 
-      <!-- Skills -->
-      <div class="mb-3">
-        <label for="skills" class="form-label">Skills Required (comma-separated):</label>
-        <input type="text" class="form-control" name="skills" id="skills" placeholder="e.g., JavaScript, Excel, SQL" required />
-      </div>
+      <input
+        type="number"
+        class="form-control"
+        id="experience"
+        name="experience"
+        min="0"
+        max="50"
+        required
+      >
+    </div>
 
-      <!-- Submit -->
-       <button type="submit" class="btn btn-primary register"
-        style="background-color: rgb(167, 46, 119); border-color: rgb(167, 46, 119);"
-        onmouseover="this.style.backgroundColor='white'; this.style.borderColor='rgb(167, 46, 119)'; this.style.color='rgb(167, 46, 119)'"
-        onmouseout="this.style.backgroundColor='rgb(167, 46, 119)'; this.style.color='white'">
-        Submit
-      </button>
-    </form>
-  </main>
+    <!-- Job Type -->
+    <div class="mb-3">
+      <label for="jobType" class="form-label">Job Type</label>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      <select
+        class="form-select"
+        id="jobType"
+        name="jobType"
+        required
+      >
+        <option value="">-- Select a type --</option>
+        <option value="Finance">Finance</option>
+        <option value="IT">IT</option>
+        <option value="Sales">Sales</option>
+        <option value="Marketing">Marketing</option>
+        <option value="HR">Human Resources</option>
+      </select>
+    </div>
+
+    <!-- Location -->
+    <div class="mb-3">
+      <label for="location" class="form-label">Location</label>
+
+      <input
+        type="text"
+        class="form-control"
+        id="location"
+        name="location"
+        placeholder="Enter location"
+        required
+      >
+    </div>
+
+    <!-- Company -->
+    <div class="mb-3">
+      <label for="company" class="form-label">Company</label>
+
+      <input
+        type="text"
+        class="form-control"
+        id="company"
+        name="company"
+        placeholder="Enter company name"
+        required
+      >
+    </div>
+
+    <!-- Skills -->
+    <div class="mb-3">
+      <label for="skills" class="form-label">
+        Skills Required (comma-separated)
+      </label>
+
+      <input
+        type="text"
+        class="form-control"
+        id="skills"
+        name="skills"
+        placeholder="Java, React, MongoDB, Node.js"
+        required
+      >
+    </div>
+
+    <!-- Submit -->
+    <button
+      type="submit"
+      class="btn btn-primary register"
+      style="background-color: rgb(167, 46, 119); border-color: rgb(167, 46, 119);"
+      onmouseover="this.style.backgroundColor='white'; this.style.borderColor='rgb(167, 46, 119)'; this.style.color='rgb(167, 46, 119)'"
+      onmouseout="this.style.backgroundColor='rgb(167, 46, 119)'; this.style.color='white'"
+    >
+      Submit
+    </button>
+
+  </form>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>

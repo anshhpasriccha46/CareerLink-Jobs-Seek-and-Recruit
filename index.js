@@ -10,6 +10,7 @@ import user_profile from './src/model/jobSeeker_profile.js';
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import JobSeeker from "./src/model/JobSeeker.js";
+import Job from "./src/model/Job.js";
 
 dotenv.config();
 const server= express();
@@ -45,7 +46,12 @@ server.post("/register_jobSeeker", login_register_jobSeeker.postregister);
 server.post("/register_recruiter", login_register_recruiter.postregister);
 server.get("/home_recruiter" ,auth , login_register_recruiter.getHome);
 server.get("/addjob" ,auth , login_register_recruiter.getAddJob);
-server.post("/post-job" ,auth , login_register_recruiter.postJob );
+server.post(
+    "/post-job",
+    auth,
+    uploadFile.single("logo"),
+    login_register_recruiter.postJob
+);
 server.get("/editJob/:id" , login_register_recruiter.editJob);
 server.post("/editJob/:id" , login_register_recruiter.savechanges);
 server.post("/deleteJob/:id" , login_register_recruiter.deleteJob);
@@ -86,6 +92,24 @@ server.get("/profile-picture/:id", async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send("Error loading profile picture");
+    }
+});
+
+server.get("/job-logo/:id", async (req, res) => {
+    try {
+
+        const job = await Job.findById(req.params.id);
+
+        if (!job || !job.logo || !job.logo.data) {
+            return res.status(404).send("Logo not found");
+        }
+
+        res.set("Content-Type", job.logo.contentType);
+        res.send(job.logo.data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading logo");
     }
 });
 

@@ -1,66 +1,62 @@
 import mongoose from "mongoose";
 
 const jobSchema = new mongoose.Schema(
-  {
-    title: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+    {
+        name: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-    company: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+        email: {
+            type: String,
+            required: true,
+            lowercase: true,
+            trim: true
+        },
 
-    companyLogo: {
-      data: Buffer,
-      contentType: String,
-    },
+        logo: {
+            data: Buffer,
+            contentType: String
+        },
 
-    jobType: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+        jobType: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-    location: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+        location: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-    experience: {
-      type: String,
-      required: true,
-      trim: true,
-    },
+        experience: {
+            type: String,
+            required: true
+        },
 
-    salary: {
-      type: String,
-      default: "",
-    },
+        skills: {
+            type: [String],
+            default: []
+        },
 
-    skills: {
-      type: [String],
-      default: [],
-    },
+        company: {
+            type: String,
+            required: true,
+            trim: true
+        },
 
-    description: {
-      type: String,
-      default: "",
+        recruiterId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Recruiter",
+            required: true
+        }
     },
-
-    recruiterId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Recruiter",
-      required: true,
+    {
+        timestamps: true
     }
-  },
-  {
-    timestamps: true,
-  }
 );
 
 const Job = mongoose.model("Job", jobSchema);

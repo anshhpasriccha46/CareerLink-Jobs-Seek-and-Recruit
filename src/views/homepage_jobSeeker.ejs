@@ -37,11 +37,11 @@
       <div class="col">
         <div class="card h-100 shadow-sm small-card">
           
-          <% if (job.logo) { %>
-            <img src=<%= job.logo %> class="card-img-top" alt="Job Image">
-          <% } else { %>
-            <img src="/images/default-job.jpg" class="card-img-top" alt="Default Image">
-          <% } %>
+        <% if (job.logo && job.logo.data) { %>
+    <img src="/job-logo/<%= job._id %>" class="card-img-top" alt="Job Image">
+<% } else { %>
+    <img src="/images/default-job.jpg" class="card-img-top" alt="Default Image">
+<% } %>
 
           <div class="card-body">
              <h5 class="card-title"><%= job.company %></h5>
@@ -56,12 +56,12 @@
             </p>
              <p class="card-text">
             
-              <strong>ID:</strong> <%= job.id %>
+              <strong>ID:</strong> <%= job._id %>
             </p>
             <div class="d-flex justify-content-between">
-              <a href="/apply_for_job/<%= job.id %>" class="btn btn-sm btn-outline-primary cardbtn">Apply</a>
+              <a href="/apply_for_job/<%= job._id %>" class="btn btn-sm btn-outline-primary cardbtn">Apply</a>
               
-              </form>
+            
             </div>
           </div>
 

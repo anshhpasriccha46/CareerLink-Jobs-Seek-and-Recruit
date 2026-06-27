@@ -17,7 +17,7 @@
         <div class="card h-100 shadow-sm small-card">
           
           <% if (job.logo) { %>
-            <img src=<%= job.logo %> class="card-img-top" alt="Job Image">
+            <img src="/job-logo/<%= job._id %>" class="card-img-top" alt="Job Image">
           <% } else { %>
             <img src="/images/default-job.jpg" class="card-img-top" alt="Default Image">
           <% } %>
@@ -34,9 +34,9 @@
               <strong>Experience:</strong> <%= job.experience %> years
             </p>
             <div class="d-flex justify-content-between">
-              <a href="/applicants/<%= job.id %>" class="btn btn-sm btn-outline-primary cardbtn">View</a>
-              <a href="/editJob/<%=job.id%>" class="btn btn-sm btn-outline-warning cardbtn">Edit</a>
-              <form action="/deleteJob/<%= job.id %>" method="POST" style="display:inline;">
+              <a href="/applicants/<%= job._id %>" class="btn btn-sm btn-outline-primary cardbtn">View</a>
+              <a href="/editJob/<%=job._id%>" class="btn btn-sm btn-outline-warning cardbtn">Edit</a>
+              <form action="/deleteJob/<%= job._id %>" method="POST" style="display:inline;">
                 <button type="submit" class="btn btn-sm btn-outline-danger cardbtn">Delete</button>
               </form>
             </div>

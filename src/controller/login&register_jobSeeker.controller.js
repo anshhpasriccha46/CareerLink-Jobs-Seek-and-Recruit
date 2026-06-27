@@ -89,16 +89,20 @@ export default class login_register_jobSeeker{
         return res.render("homepage_jobSeeker" , {layout: 'layout_jobSeeker' , profile: profile , jobs:jobs});
        
     }
-    static  filterJobs(req , res) {
-    let filteredResults = recruiter_jobData.getData();
-    let filterJobType  = req.body.jobType
-    let filterLocation= req.body.location
-    let filterSkills= req.body.skills
+   static async filterJobs(req, res) {
 
-    // Normalize filter values to lowercase and trim whitespace
-    const jobTypeFilter = filterJobType ? filterJobType.toLowerCase().trim() : '';
-    const locationFilter = filterLocation ? filterLocation.toLowerCase().trim() : '';
-    const skillsFilterArray = filterSkills ? filterSkills.toLowerCase().split(',').map(s => s.trim()).filter(s => s !== '') : [];
+    let filteredResults = await Job.find();
+
+    const filterJobType = req.body.jobType;
+    const filterLocation = req.body.location;
+    const filterSkills = req.body.skills;
+
+    // Normalize filter values
+    const jobTypeFilter = filterJobType ? filterJobType.toLowerCase().trim() : "";
+    const locationFilter = filterLocation ? filterLocation.toLowerCase().trim() : "";
+    const skillsFilterArray = filterSkills
+        ? filterSkills.toLowerCase().split(",").map(skill => skill.trim()).filter(skill => skill !== "")
+        : [];
 
     // Filter by Job Type
     if (jobTypeFilter) {
@@ -116,21 +120,25 @@ export default class login_register_jobSeeker{
 
     // Filter by Skills
     if (skillsFilterArray.length > 0) {
-        // A job matches if it has AT LEAST ONE of the required skills
-        filteredResults = filteredResults.filter(job => {
-            // Check if every skill in skillsFilterArray is present in job.skills
-            // For a "match if job has ANY of the required skills", use .some()
-            // For a "match if job has ALL of the required skills", use .every()
-            return skillsFilterArray.every(requiredSkill =>
-                job.skills.some(jobSkill => jobSkill.toLowerCase().includes(requiredSkill))
-            );
-        });
+        filteredResults = filteredResults.filter(job =>
+            skillsFilterArray.every(requiredSkill =>
+                job.skills.some(jobSkill =>
+                    jobSkill.toLowerCase().includes(requiredSkill)
+                )
+            )
+        );
     }
 
-     res.locals.styles = '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
-           const profile = user_profile.getProfilesByEmail(req.session.email);
-        return res.render("homepage_jobSeeker" , {layout: 'layout_jobSeeker' , profile: profile , jobs:filteredResults});
-       
+    const profile = await JobSeeker.findById(req.session.userId);
+
+    res.locals.styles =
+        '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
+
+    return res.render("homepage_jobSeeker", {
+        layout: "layout_jobSeeker",
+        profile,
+        jobs: filteredResults
+    });
 }
 static sendProfile(req , res){
     const id=req.params.id;

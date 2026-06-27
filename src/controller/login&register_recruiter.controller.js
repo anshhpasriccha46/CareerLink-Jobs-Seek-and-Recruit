@@ -1,6 +1,6 @@
-import user_recruiter from "../model/user_recruiter.model.js";
 import { sendEmail } from "../../mail.js";
-import recruiter_jobData from "../model/recruiter_jobPostData.model.js";
+import Job from "../model/Job.js";
+import Recruiter from "../model/Recruiter.js";
 
 export default class login_register_recruiter{
     static getintro(req, res){
@@ -11,103 +11,155 @@ export default class login_register_recruiter{
         
             res.render('register_recruiter' , {layout:false ,userType: 'recruiter'});
     }
-     static postregister(req , res){
-        req.session.name=req.body.name;
-          req.session.email=req.body.email;
-          
-            console.log("Session saved email and name");
+    static async postregister(req, res) {
 
-         user_recruiter.add(req);
-         const text="Welcome to CareerLink. Lets get you the right people:)";
-         sendEmail(req.body.email , "Registered",text);
-         res.locals.styles='<link rel="stylesheet" href="/homepage_recruiter.css">'
-        res.render("homepage_recruiter" , {layout:"layout_recruiter" ,jobs:null});
-    
-        }
-        static getHome(req , res){
-            console.log(recruiter_jobData.getData());
-            const jobs = recruiter_jobData.getData();
-            let correctjobs=[];
-            for(let i=0;i<jobs.length;i++){
-                if(jobs[i].email === req.session.email)
-                correctjobs.push(jobs[i]);
-            }
-            res.locals.styles='<link rel="stylesheet" href="/homepage_recruiter.css">'
-            res.render('homepage_recruiter' , {layout:"layout_recruiter" ,  jobs: correctjobs});
-        }
+    req.session.name = req.body.name;
+    req.session.email = req.body.email;
 
+    const newRecruiter = await Recruiter.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
+    });
+
+    req.session.userId = newRecruiter._id;
+
+    const text = "Welcome to CareerLink. Start posting jobs and find the perfect candidates! :)";
+
+    sendEmail(req.body.email, "Registered", text);
+
+    res.redirect("/home_recruiter");
+}
+      static async getHome(req, res) {
+
+    const recruiter = await Recruiter.findById(req.session.userId);
+
+    const jobs = await Job.find({
+        recruiterId: req.session.userId
+    });
+
+    res.locals.styles =
+        '<link rel="stylesheet" href="/homepage_recruiter.css">';
+
+    return res.render("homepage_recruiter", {
+        layout: "layout_recruiter",
+        recruiter,
+        jobs
+    });
+}
         static getAddJob(req, res){
            res.locals.styles = '<link rel="stylesheet" href="/addJob.css">';
            res.render("addJob" , {layout:false});
         }
 
-        static postJob(req, res){
-
-            console.log("accessed postJOb in recruiter controller");
-
-            recruiter_jobData.addNewJob(req.session.name , 
-                                        req.session.email ,
-                                        req.body.logo,
-                                        req.body.jobType,
-                                        req.body.location,
-                                        req.body.experience,
-                                        req.body.skills,
-                                        req.body.company);
-            
-            res.redirect("/home_recruiter" );
-
-            
-        }
-
-        static editJob(req, res){
-            const id=req.params.id;
-  console.log("id to be edited: " , id);
-            const job=recruiter_jobData.getJobById(id);
-          
-           return res.render("editJob" , {layout:false , job:job});
-            
-        }
-
-        static savechanges(req, res){
-            const id=req.params.id;
-            recruiter_jobData.makechanges(id ,req.body , req.session.name, req.session.email);
-            return res.redirect("/home_recruiter" );
+     static async postJob(req, res) {
+        
 
 
-        }
-        static deleteJob(req , res){
-            const id=req.params.id;
-            recruiter_jobData.delete(id);
-              return res.redirect("/home_recruiter" );
-        }
-        static  filterJobsByCompanyOrType(req  ,res) {
-    let jobs=recruiter_jobData.getDataByEmail(req.session.email); 
-    let searchTerm = req.body.search;
-    console.log(jobs , searchTerm);
-    // If the search term is empty, return all jobs
-   
+    await Job.create({
 
-    // Split the search term by commas, trim whitespace, and convert to lowercase
-    const searchTermsArray = searchTerm.toLowerCase().split(',').map(term => term.trim()).filter(term => term !== '');
+        name: req.session.name,
 
-    // If after splitting and trimming, there are no valid terms, return all jobs
-    
+        email: req.session.email,
 
-    // Filter the jobs
-    let filteredResults = jobs.filter(job => {
-        // A job matches if its company name OR job type includes ANY of the search terms
-        return job.jobType===searchTerm;
-    });
-     filteredResults = jobs.filter(job => {
-        // A job matches if its company name OR job type includes ANY of the search terms
-        return job.location===searchTerm;
+        company: req.body.company,
+
+        jobType: req.body.jobType,
+
+        location: req.body.location,
+
+        experience: req.body.experience,
+
+        skills: req.body.skills.split(",").map(skill => skill.trim()),
+
+        logo: {
+            data: req.file.buffer,
+            contentType: req.file.mimetype
+        },
+
+        recruiterId: req.session.userId
     });
 
-    console.log(filteredResults);
+    res.redirect("/home_recruiter");
+}
 
-  
-    res.locals.styles='<link rel="stylesheet" href="/homepage_recruiter.css">'
-            res.render('homepage_recruiter' , {layout:"layout_recruiter" ,  jobs: filteredResults});
+       static async editJob(req, res) {
+
+    const job = await Job.findById(req.params.id);
+
+    return res.render("editJob", {
+        layout: false,
+        job
+    });
+
+}
+
+      static async savechanges(req, res) {
+
+    await Job.findByIdAndUpdate(
+
+        req.params.id,
+
+        {
+
+            company: req.body.company,
+
+            jobType: req.body.jobType,
+
+            location: req.body.location,
+
+            experience: req.body.experience,
+
+            skills: req.body.skills
+                .split(",")
+                .map(skill => skill.trim())
+
         }
+
+    );
+
+    res.redirect("/home_recruiter");
+
+}
+       static async deleteJob(req, res) {
+
+    await Job.findByIdAndDelete(req.params.id);
+
+    res.redirect("/home_recruiter");
+
+}
+       static async filterJobsByCompanyOrType(req, res) {
+
+    const jobs = await Job.find({
+        recruiterId: req.session.userId
+    });
+
+    const searchTerms = req.body.search
+        .toLowerCase()
+        .split(",")
+        .map(term => term.trim())
+        .filter(term => term !== "");
+
+    const filteredResults = jobs.filter(job =>
+
+        searchTerms.some(term =>
+
+            job.company.toLowerCase().includes(term) ||
+
+            job.jobType.toLowerCase().includes(term)
+
+        )
+
+    );
+
+    res.locals.styles =
+        '<link rel="stylesheet" href="/homepage_recruiter.css">';
+
+    return res.render("homepage_recruiter", {
+        layout: "layout_recruiter",
+        jobs: filteredResults
+    });
+
+}
     
 }

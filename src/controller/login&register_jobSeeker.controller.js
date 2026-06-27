@@ -1,11 +1,9 @@
-import user_jobSeeker from "../model/user_jobSeeker.model.js";
 import JobSeeker from "../model/JobSeeker.js";
 import Job from "../model/Job.js";
 import { sendEmail } from "../../mail.js";
-import recruiter_jobData from "../model/recruiter_jobPostData.model.js";
-import user_profile from "../model/jobSeeker_profile.js";
 import sendUserProfile from "../../mail_profile.js";
 import Applicant from "../model/Applicants.js";
+import bcrypt from "bcrypt";
 
 export default class login_register_jobSeeker{
 
@@ -31,11 +29,13 @@ export default class login_register_jobSeeker{
           
       
 
-            const newUser  = await JobSeeker.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-    });
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+const newUser = await JobSeeker.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: hashedPassword
+});
     req.session.userId = newUser._id;
 
         const text="Welcome to CareerLink. Lets help you land your dream job:)"
@@ -151,7 +151,7 @@ static async sendProfile(req, res) {
     const job = await Job.findById(jobId);
 
     // Send profile to recruiter
-    sendUserProfile(profile, job.email);
+    await sendUserProfile(profile, job.email);
 
     console.log("Email and profile sent");
 

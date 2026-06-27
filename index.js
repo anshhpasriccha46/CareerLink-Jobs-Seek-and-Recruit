@@ -6,7 +6,6 @@ import login_register_recruiter from './src/controller/login&register_recruiter.
 import session from 'express-session';
 import { auth } from './src/middleware/auth.js';
 import { uploadFile } from './src/middleware/image-upload.middleware.js';
-import user_profile from './src/model/jobSeeker_profile.js';
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
 import JobSeeker from "./src/model/JobSeeker.js";
@@ -68,12 +67,22 @@ server.post(
   ]),
   login_register_jobSeeker.postProfile
 );
-server.get("/home_jobSeeker" ,auth,  (req, res) => {
- res.locals.styles = '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
-            const profile = user_profile.getProfilesByEmail(req.session.email);
-         return res.render("homepage_jobSeeker" , {layout: 'layout_jobSeeker' , profile: profile , jobs:filteredResults});
-        
-} );
+server.get("/home_jobSeeker", auth, async (req, res) => {
+
+    const profile = await JobSeeker.findById(req.session.userId);
+
+    const jobs = await Job.find();
+
+    res.locals.styles =
+        '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
+
+    return res.render("homepage_jobSeeker", {
+        layout: "layout_jobSeeker",
+        profile,
+        jobs
+    });
+
+});
 server.post("/filterByParameters" , auth , login_register_jobSeeker.filterJobs);
 server.post("/filterJobs_recruiter" ,auth, login_register_recruiter.filterJobsByCompanyOrType);
 server.get("/apply_for_job/:id" , auth , login_register_jobSeeker.sendProfile);

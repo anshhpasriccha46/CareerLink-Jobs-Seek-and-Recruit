@@ -2,6 +2,7 @@ import { sendEmail } from "../../mail.js";
 import Job from "../model/Job.js";
 import Recruiter from "../model/Recruiter.js";
 import Applicant from "../model/Applicants.js";
+import bcrypt from "bcrypt";
 
 export default class login_register_recruiter{
     static getintro(req, res){
@@ -16,13 +17,13 @@ export default class login_register_recruiter{
 
     req.session.name = req.body.name;
     req.session.email = req.body.email;
+const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    const newRecruiter = await Recruiter.create({
-        name: req.body.name,
-        email: req.body.email,
-        password: req.body.password
-    });
-
+const newRecruiter = await Recruiter.create({
+    name: req.body.name,
+    email: req.body.email,
+    password: hashedPassword
+});
     req.session.userId = newRecruiter._id;
 
     const text = "Welcome to CareerLink. Start posting jobs and find the perfect candidates! :)";

@@ -1,4 +1,6 @@
 import user_jobSeeker from "../model/user_jobSeeker.model.js";
+import JobSeeker from "../model/JobSeeker.js";
+import Job from "../model/Job.js";
 import { sendEmail } from "../../mail.js";
 import recruiter_jobData from "../model/recruiter_jobPostData.model.js";
 import user_profile from "../model/jobSeeker_profile.js";
@@ -21,13 +23,21 @@ export default class login_register_jobSeeker{
     }
 
 
-    static postregister(req , res){
+    static async postregister(req , res){
         
 
          req.session.name=req.body.name;
           req.session.email=req.body.email;
           
-        user_jobSeeker.add(req.body);
+      
+
+            const newUser  = await JobSeeker.create({
+        name: req.body.name,
+        email: req.body.email,
+        password: req.body.password
+    });
+    req.session.userId = newUser._id;
+
         const text="Welcome to CareerLink. Lets help you land your dream job:)"
         sendEmail(req.body.email , "Registered",text);
         
@@ -38,16 +48,45 @@ export default class login_register_jobSeeker{
 
     }
 
-    static postProfile(req, res){
+    static async postProfile(req, res){
        
-        user_profile.addNewProfile(req);
-        const job=recruiter_jobData.getData();
+        //Updated
+            await JobSeeker.findByIdAndUpdate(
+
+        req.session.userId,
+
+        {
+
+            phone:req.body.phone,
+
+            age:req.body.age,
+
+            experience:req.body.experience,
+
+            profilePicture:{
+                data:req.files.profilePic[0].buffer,
+                contentType:req.files.profilePic[0].mimetype
+            },
+
+            resume:{
+                data:req.files.resume[0].buffer,
+                contentType:req.files.resume[0].mimetype
+            }
+
+        }
+
+    );
+    const jobs = await Job.find();
+
+    const profile = await JobSeeker.findById(
+        req.session.userId
+    );
+
         
-        recruiter_jobData.printJobs();
 //Get the corrext profile to feed the homepage with
            res.locals.styles = '<link rel="stylesheet" href="/homepage_jobSeeker.css">';
-           const profile = user_profile.getProfilesByEmail(req.session.email);
-        return res.render("homepage_jobSeeker" , {layout: 'layout_jobSeeker' , profile: profile , jobs:job});
+           
+        return res.render("homepage_jobSeeker" , {layout: 'layout_jobSeeker' , profile: profile , jobs:jobs});
        
     }
     static  filterJobs(req , res) {

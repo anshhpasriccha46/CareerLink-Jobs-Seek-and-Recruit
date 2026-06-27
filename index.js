@@ -9,6 +9,7 @@ import { uploadFile } from './src/middleware/image-upload.middleware.js';
 import user_profile from './src/model/jobSeeker_profile.js';
 import connectDB from "./config/db.js";
 import dotenv from "dotenv";
+import JobSeeker from "./src/model/JobSeeker.js";
 
 dotenv.config();
 const server= express();
@@ -71,7 +72,23 @@ server.post("/filterJobs_recruiter" ,auth, login_register_recruiter.filterJobsBy
 server.get("/apply_for_job/:id" , auth , login_register_jobSeeker.sendProfile);
 server.get("/applicants/:id" , auth , login_register_jobSeeker.viewApplicants);
 
+server.get("/profile-picture/:id", async (req, res) => {
+    try {
+        const user = await JobSeeker.findById(req.params.id);
 
-server.listen(4600 ,  () => {
-  console.log('Server is running on http://localhost:4600');
+        if (!user || !user.profilePicture || !user.profilePicture.data) {
+            return res.status(404).send("Profile picture not found");
+        }
+
+        res.set("Content-Type", user.profilePicture.contentType);
+        res.send(user.profilePicture.data);
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Error loading profile picture");
+    }
+});
+
+server.listen(process.env.PORT || 4600 ,  () => {
+  console.log('Server is running on http://localhost:' + (process.env.PORT || 4600));
 });

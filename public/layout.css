@@ -22,12 +22,12 @@ html, body {
     color: white;
     text-decoration: none;
 }
-header{
-    border-style: solid;
-    position:sticky;
-    background-color: #0c0930 ;
-    width:100%;
-    margin-top: 0px;
+header {
+    display: flex;
+    align-items: center;
+    background-color: #0c0930;
+    width: 100%;
+    padding: 10px 20px;
 }
 .quote_container {
     box-sizing: border-box;
@@ -114,4 +114,15 @@ margin-right: 5px;
 
     /* Optional: Add a border */
     border: 1px solid #ccc; /* Light gray border */
+}
+.profile {
+    margin-left: auto;
+}
+
+.profile img {
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid white;
 }

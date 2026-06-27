@@ -151,7 +151,7 @@ static async sendProfile(req, res) {
     const job = await Job.findById(jobId);
 
     // Send profile to recruiter
-    await sendUserProfile(profile, job.email);
+     sendUserProfile(profile, job.email);
 
     console.log("Email and profile sent");
 

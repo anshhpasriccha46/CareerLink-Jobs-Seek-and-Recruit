@@ -7,8 +7,12 @@ import session from 'express-session';
 import { auth } from './src/middleware/auth.js';
 import { uploadFile } from './src/middleware/image-upload.middleware.js';
 import user_profile from './src/model/jobSeeker_profile.js';
+import connectDB from "./config/db.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 const server= express();
+connectDB();
 
 //parse form data
 server.use(express.urlencoded({ extended: true }));

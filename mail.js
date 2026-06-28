@@ -1,27 +1,36 @@
-import nodemailer from 'nodemailer';
+import { Resend } from "resend";
 
-// Replace with your real Gmail and app password
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'ansh.pasricha2005@gmail.com',         // Your Gmail
-    pass: 'yvod asje enot swcp'       // App Password (not your Gmail password)
-  }
-});
 
-export const sendEmail = async (to, subject, text ) => {
-  const mailOptions = {
-    from: 'ansh.pasricha2005@gmail.com',
-    to: to,
-    subject: subject,
-    text: text
-  };
+export const sendEmail = async (to, subject, text) => {
 
-  try {
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.response);
-  } catch (err) {
-    console.error('Error sending email:', err);
-  }
+    try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const { data, error } = await resend.emails.send({
+
+            from: "onboarding@resend.dev",
+
+            to,
+
+            subject,
+
+            text
+
+        });
+
+        if (error) {
+
+            console.error("Error sending email:", error);
+            return;
+
+        }
+
+        console.log("Email sent:", data);
+
+    } catch (err) {
+
+        console.error("Error sending email:", err);
+
+    }
+
 };

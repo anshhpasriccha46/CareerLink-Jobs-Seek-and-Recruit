@@ -39,8 +39,8 @@ const newUser = await JobSeeker.create({
     req.session.userId = newUser._id;
 
         const text="Welcome to CareerLink. Lets help you land your dream job:)"
-        sendEmail(req.body.email , "Registered",text);
-        
+        await sendEmail(req.body.email , "Registered",text);
+        console.log("email send for jobseeker registration");
 
      
         res.redirect('/JobSeeker_profile');
@@ -151,7 +151,9 @@ static async sendProfile(req, res) {
     const job = await Job.findById(jobId);
 
     // Send profile to recruiter
-     sendUserProfile(profile, job.email);
+    console.log(profile.profilePicture);
+    console.log(profile.resume);
+     await sendUserProfile(profile, job.email);
 
     console.log("Email and profile sent");
 

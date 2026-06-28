@@ -32,6 +32,34 @@ const newRecruiter = await Recruiter.create({
 
     res.redirect("/home_recruiter");
 }
+static getLogin(req, res) {
+        res.render("login", { layout: false, userType: "recruiter" });
+    }
+    static async postLogin(req, res) {
+
+    const recruiter = await Recruiter.findOne({
+        email: req.body.email
+    });
+
+    if (!recruiter) {
+        return res.send("No account found with this email.");
+    }
+
+    const isMatch = await bcrypt.compare(
+        req.body.password,
+        recruiter.password
+    );
+
+    if (!isMatch) {
+        return res.send("Incorrect password.");
+    }
+
+    req.session.userId = recruiter._id;
+    req.session.name = recruiter.name;
+    req.session.email = recruiter.email;
+
+    res.redirect("/home_recruiter");
+    }
       static async getHome(req, res) {
 
     const recruiter = await Recruiter.findById(req.session.userId);

@@ -44,6 +44,10 @@ server.get('/register_jobSeeker' , login_register_jobSeeker.getregister);
 server.get("/register_recruiter" , login_register_recruiter.getregister);
 server.post("/register_jobSeeker", login_register_jobSeeker.postregister);
 server.post("/register_recruiter", login_register_recruiter.postregister);
+server.get("/login_jobSeeker", login_register_jobSeeker.getLogin);
+server.post("/login_jobSeeker", login_register_jobSeeker.postLogin);
+server.get("/login_recruiter", login_register_recruiter.getLogin);
+server.post("/login_recruiter", login_register_recruiter.postLogin);
 server.get("/home_recruiter" ,auth , login_register_recruiter.getHome);
 server.get("/addjob" ,auth , login_register_recruiter.getAddJob);
 server.post(
@@ -52,11 +56,11 @@ server.post(
     uploadFile.single("logo"),
     login_register_recruiter.postJob
 );
-server.get("/editJob/:id" , login_register_recruiter.editJob);
-server.post("/editJob/:id" , login_register_recruiter.savechanges);
-server.post("/deleteJob/:id" , login_register_recruiter.deleteJob);
+server.get("/editJob/:id" , auth , login_register_recruiter.editJob);
+server.post("/editJob/:id" ,auth , login_register_recruiter.savechanges);
+server.post("/deleteJob/:id" , auth , login_register_recruiter.deleteJob);
 
-server.get('/JobSeeker_profile', (req, res) => {
+server.get('/JobSeeker_profile', auth,(req, res) => {
   res.render('JobSeeker_profile' , {layout:false});
 });
 server.post(
@@ -88,7 +92,7 @@ server.post("/filterJobs_recruiter" ,auth, login_register_recruiter.filterJobsBy
 server.get("/apply_for_job/:id" , auth , login_register_jobSeeker.sendProfile);
 server.get("/applicants/:id" , auth , login_register_recruiter.viewApplicants);
 
-server.get("/profile-picture/:id", async (req, res) => {
+server.get("/profile-picture/:id" ,async (req, res) => {
     try {
         const user = await JobSeeker.findById(req.params.id);
 
@@ -105,7 +109,7 @@ server.get("/profile-picture/:id", async (req, res) => {
     }
 });
 
-server.get("/job-logo/:id", async (req, res) => {
+server.get("/job-logo/:id",  async (req, res) => {
     try {
 
         const job = await Job.findById(req.params.id);

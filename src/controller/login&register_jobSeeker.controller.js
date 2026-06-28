@@ -89,6 +89,34 @@ const newUser = await JobSeeker.create({
         return res.render("homepage_jobSeeker" , {layout: 'layout_jobSeeker' , profile: profile , jobs:jobs});
        
     }
+    static getLogin(req, res) {
+        res.render("login", { layout: false, userType: "jobSeeker" });
+    }
+    static async postLogin(req, res) {
+
+    const user = await JobSeeker.findOne({
+        email: req.body.email
+    });
+
+    if (!user) {
+        return res.send("No account found with this email.");
+    }
+
+    const isMatch = await bcrypt.compare(
+        req.body.password,
+        user.password
+    );
+
+    if (!isMatch) {
+        return res.send("Incorrect password.");
+    }
+
+    req.session.userId = user._id;
+    req.session.name = user.name;
+    req.session.email = user.email;
+
+    res.redirect("/home_jobSeeker");
+    }
    static async filterJobs(req, res) {
 
     let filteredResults = await Job.find();
